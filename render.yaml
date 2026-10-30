@@ -1,0 +1,16 @@
+# Render Blueprint: New -> Blueprint -> pick this repo. Render asks for the two secrets below.
+services:
+  - type: web
+    name: koya-booking-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
