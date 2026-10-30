@@ -21,6 +21,16 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api/, ''),
           headers: { 'X-API-Key': env.API_KEY ?? '' },
+          // Same admin-key gate as api/proxy.ts.
+          bypass: (req, res) => {
+            if (!/^\/api\/reset\/*(\?|$)/.test(req.url ?? '')) return
+            const ok = env.ADMIN_KEY && req.headers['x-admin-key'] === env.ADMIN_KEY
+            if (ok) return
+            res!.statusCode = env.ADMIN_KEY ? 401 : 404
+            res!.setHeader('content-type', 'application/json')
+            res!.end(JSON.stringify({ error: env.ADMIN_KEY ? 'wrong admin key' : 'not found' }))
+            return false
+          },
         },
       },
     },

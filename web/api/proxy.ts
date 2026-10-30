@@ -1,6 +1,13 @@
 // Vercel function: forwards /api/* (see vercel.json) to the booking API on Render and adds
 // the API key server-side, so the key never ships to the browser.
-// Env (Vercel project settings): API_URL=https://<your-app>.onrender.com, API_KEY=<same key as Render>
+// Env (Vercel project settings): API_URL=https://<your-app>.onrender.com, API_KEY=<same key as Render>,
+// ADMIN_KEY=<passcode for the Admin tab's reset; leave unset to disable it>
+import { createHash, timingSafeEqual } from 'node:crypto'
+
+const sameSecret = (a: string, b: string) => {
+  const hash = (s: string) => createHash('sha256').update(s).digest()
+  return timingSafeEqual(hash(a), hash(b))
+}
 
 async function handler(request: Request): Promise<Response> {
   const { API_URL, API_KEY } = process.env
@@ -19,9 +26,13 @@ async function handler(request: Request): Promise<Response> {
   if (target.origin !== base.origin) {
     return Response.json({ error: 'bad path' }, { status: 400 })
   }
-  // The public site never needs to wipe the database.
+  // Wiping the database needs the admin key too. With ADMIN_KEY unset, /reset stays hidden.
   if (/\/reset\/*$/.test(target.pathname)) {
-    return Response.json({ error: 'not found' }, { status: 404 })
+    const { ADMIN_KEY } = process.env
+    if (!ADMIN_KEY) return Response.json({ error: 'not found' }, { status: 404 })
+    if (!sameSecret(request.headers.get('x-admin-key') ?? '', ADMIN_KEY)) {
+      return Response.json({ error: 'wrong admin key' }, { status: 401 })
+    }
   }
 
   const headers = new Headers({ 'X-API-Key': API_KEY })

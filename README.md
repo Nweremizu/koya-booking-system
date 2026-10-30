@@ -38,8 +38,9 @@ BASE_URL=https://your-api.onrender.com API_KEY=... node check.mjs
    - Build: `npm install && npm run build` · Start: `npm start`
    - Env: `API_KEY`, `DATABASE_URL`
 3. **Web on Vercel**: New Project from this repo, **Root Directory `web`** (framework: Vite).
-   - Env: `API_URL=https://<your-api>.onrender.com`, `API_KEY` (same as Render)
-4. Seed slots: `POST /reset` straight to the Render URL with your key. The web proxy blocks `/reset`.
+   - Env: `API_URL=https://<your-api>.onrender.com`, `API_KEY` (same as Render),
+     `ADMIN_KEY` (a passcode for the Admin tab; unset = reset disabled on the site)
+4. Seed slots: Admin tab on the site with the admin key, or `POST /reset` straight to the Render URL.
 
 Idempotency keys and rate-limit counters live in API memory, which is fine for one Render instance.
 Move them to Postgres or Redis before running more than one.

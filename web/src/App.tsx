@@ -3,6 +3,7 @@ import { StethoscopeIcon } from 'lucide-react'
 import { BookSlots } from '@/components/BookSlots'
 import { FindBooking } from '@/components/FindBooking'
 import { MyBookings } from '@/components/MyBookings'
+import { ResetData } from '@/components/ResetData'
 import { Toaster } from '@/components/ui/sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api, type Slot } from '@/lib/api'
@@ -59,6 +60,7 @@ export default function App() {
             <TabsTrigger value="book">Book</TabsTrigger>
             <TabsTrigger value="mine">My bookings</TabsTrigger>
             <TabsTrigger value="find">Find booking</TabsTrigger>
+            <TabsTrigger value="admin">Admin</TabsTrigger>
           </TabsList>
           <div className="rounded-xl border bg-background p-4 sm:p-6">
             <TabsContent value="book">
@@ -84,6 +86,9 @@ export default function App() {
             </TabsContent>
             <TabsContent value="find">
               <FindBooking slotsById={slotsById} onCancelled={refreshSlots} />
+            </TabsContent>
+            <TabsContent value="admin">
+              <ResetData slots={allSlots} onReset={refreshSlots} />
             </TabsContent>
           </div>
         </Tabs>
