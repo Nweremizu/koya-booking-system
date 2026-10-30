@@ -67,22 +67,14 @@ export const api = {
   cancel: (id: string) =>
     request<Booking>(`/bookings/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
-  // Replaces every slot and deletes every booking. The proxy only lets it through with the admin key.
-  reset: (slots: Omit<Slot, 'available'>[], adminKey: string) =>
-    request<{ ok: true }>('/reset', {
-      method: 'POST',
-      body: JSON.stringify({ slots }),
-      headers: { 'X-Admin-Key': adminKey },
-    }),
+  // Replaces every slot and deletes every booking.
+  reset: (slots: Omit<Slot, 'available'>[]) =>
+    request<{ ok: true }>('/reset', { method: 'POST', body: JSON.stringify({ slots }) }),
 }
 
 export function errorMessage(err: unknown): string {
   if (err instanceof ApiError) {
-    if (err.status === 401) {
-      return err.message === 'wrong admin key'
-        ? 'Wrong admin key.'
-        : 'The booking service rejected our API key.'
-    }
+    if (err.status === 401) return 'The booking service rejected our API key.'
     if (err.status === 429) {
       return `Too many attempts. Try again in ${err.retryAfter ?? 60} seconds.`
     }

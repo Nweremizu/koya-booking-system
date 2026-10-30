@@ -11,7 +11,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { api, errorMessage, type Slot } from '@/lib/api'
@@ -30,7 +29,6 @@ const toJson = (slots: Slot[]) =>
 
 export function ResetData({ slots, onReset }: Props) {
   const [text, setText] = useState(() => toJson(slots))
-  const [adminKey, setAdminKey] = useState('')
   const [parsed, setParsed] = useState<Omit<Slot, 'available'>[] | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +50,7 @@ export function ResetData({ slots, onReset }: Props) {
     if (!parsed) return
     setBusy(true)
     try {
-      await api.reset(parsed, adminKey)
+      await api.reset(parsed)
       toast.success(`Reset done: ${parsed.length} slots, no bookings.`)
       onReset()
     } catch (err) {
@@ -82,17 +80,6 @@ export function ResetData({ slots, onReset }: Props) {
             className="min-h-64 font-mono text-xs"
             value={text}
             onChange={(e) => setText(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-2 sm:max-w-xs">
-          <Label htmlFor="admin-key">Admin key</Label>
-          <Input
-            id="admin-key"
-            type="password"
-            required
-            autoComplete="off"
-            value={adminKey}
-            onChange={(e) => setAdminKey(e.target.value)}
           />
         </div>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
