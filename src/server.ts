@@ -1,5 +1,6 @@
 import express, { Application, ErrorRequestHandler } from "express";
 import cors from "cors";
+import path from "node:path";
 import { authMiddleware } from "./middleware/auth.js";
 import { validateBooking } from "./middleware/validation/booking.js";
 import {
@@ -19,6 +20,29 @@ app.use(cors());
 
 app.get("/health", (req, res) => {
   res.status(200).send("Up and Running");
+});
+
+// The assessment's contract, public like /health. /docs renders it with Swagger UI
+// ("Authorize" takes the API key, then "Try it out" calls this server).
+app.get("/openapi.json", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "openapi.json"));
+});
+
+app.get("/docs", (req, res) => {
+  res.type("html").send(`<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clinic booking API</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css" />
+</head>
+<body>
+  <div id="ui"></div>
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script>SwaggerUIBundle({ url: "/openapi.json", dom_id: "#ui" });</script>
+</body>
+</html>`);
 });
 
 app.use(authMiddleware);

@@ -109,15 +109,16 @@ export function BookSlots({ providers, version, email, onBooked, onSlotsChanged,
                 const past = hasStarted(s.start)
                 const bookable = s.available && !past
                 return (
+                  // Booked slots stay clickable so trying again shows the API's 409.
                   <button
                     key={s.id}
                     type="button"
-                    disabled={!bookable}
+                    disabled={past}
                     onClick={() => {
                       setSelected(s)
                       setOpen(true)
                     }}
-                    className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3 text-left transition-colors hover:border-primary/40 hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:border-border disabled:hover:bg-card"
+                    className={`flex items-center justify-between gap-3 rounded-lg border bg-card p-3 text-left transition-colors hover:border-primary/40 hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:border-border disabled:hover:bg-card ${bookable ? '' : 'opacity-70'}`}
                   >
                     <span>
                       <span className="block font-medium tabular-nums">
@@ -192,7 +193,7 @@ function BookForm({ slot, defaultEmail, onBooked, onConflict, onClose, onShowMyB
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 409
-          ? 'Someone just booked this slot. Please pick another time.'
+          ? 'This slot is already booked. Please pick another time.'
           : errorMessage(err),
       )
       if (err instanceof ApiError && err.status === 409) onConflict()
@@ -240,6 +241,7 @@ function BookForm({ slot, defaultEmail, onBooked, onConflict, onClose, onShowMyB
           <DialogTitle>Book this appointment</DialogTitle>
           <DialogDescription>
             {when} with {slot.provider}
+            {!slot.available && ' · This slot looks booked already.'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-2">

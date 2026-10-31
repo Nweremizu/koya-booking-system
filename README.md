@@ -1,6 +1,7 @@
 # Clinic booking
 
-- **API** (repo root): Express + TypeScript, deployed on Render. Spec: koyaacademy.com/assessment-api.
+- **API** (repo root): Express + TypeScript, deployed on Render. Spec: [`openapi.json`](openapi.json),
+  served at `/openapi.json` and browsable at `/docs` (no key needed to read it).
 - **Web app** (`web/`): React + Tailwind + shadcn/ui, deployed on Vercel. It talks to the API through
   `web/api/proxy.ts`, which adds the API key server-side, so the key never reaches the browser.
 
